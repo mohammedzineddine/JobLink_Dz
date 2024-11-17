@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "835211888193",
+    "project_id": "local-jobs-12bf1",
+    "storage_bucket": "local-jobs-12bf1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835211888193:android:2af8491c13446f124a68c0",
+        "android_client_info": {
+          "package_name": "com.example.localjobs"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOPIKrG3hUJLHqQ4e23pemseCZXL3LKqU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
