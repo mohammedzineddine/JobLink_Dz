@@ -1,6 +1,8 @@
 package com.example.localjobs.Screens
 
+import UserLoginScreen
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,21 +10,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.example.localjobs.pref.PreferencesManager
-import com.example.localjobs.pref.UserPreferences
+import com.example.localjobs.pref.SettingPreferences
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import java.util.*
+import org.koin.compose.koinInject
+
 
 class SettingsScreen : Screen {
 
@@ -30,15 +34,19 @@ class SettingsScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.current
         val context = LocalContext.current
-        val preferencesManager = PreferencesManager(context)
+
+        // Use Koin to inject PreferencesManager and FirebaseAuth
+        val preferencesManager: PreferencesManager = koinInject()
+        val firebaseAuth: FirebaseAuth = koinInject()
+
         val preferences by preferencesManager.preferencesFlow.collectAsState(
-            initial = UserPreferences("System Default", "English", true)
+            initial = SettingPreferences("System Default", "English", true)
         )
 
         val coroutineScope = rememberCoroutineScope()
 
         SettingsContent(
-            userPreferences = preferences,
+            settingPreferences = preferences,
             onThemeChange = { theme ->
                 coroutineScope.launch {
                     preferencesManager.updateTheme(theme)
@@ -48,38 +56,58 @@ class SettingsScreen : Screen {
                 coroutineScope.launch {
                     preferencesManager.updateLanguage(language)
                     updateLocale(context, language) // Change locale
+                    restartActivity(context) // Restart activity to apply changes
                 }
             },
             onNotificationsToggle = { enabled ->
                 coroutineScope.launch {
                     preferencesManager.updateNotifications(enabled)
                 }
+            },
+            onLogout = {
+                // Sign out the user
+                firebaseAuth.signOut()
+                // Navigate to login screen after logout
+                navigator?.push(IntroScreen()) // Assuming you have UserLoginScreen
             }
         )
     }
 
     private fun updateLocale(context: Context, language: String) {
         val locale = when (language) {
-            "Arabic" -> Locale("ar")
-            "French" -> Locale("fr")
-            else -> Locale("en")
+            "Arabic" -> Locale("values-ar-DZ")
+            "French" -> Locale("values-fr-FR")
+            else -> Locale("en") // Default to English
         }
 
-        val config = Configuration(context.resources.configuration)
         Locale.setDefault(locale)
+        val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
-        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+
+        // Update the locale using createConfigurationContext
+        context.createConfigurationContext(config)
+    }
+
+    private fun restartActivity(context: Context) {
+        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        context.startActivity(intent)
     }
 }
 
 @Composable
 fun SettingsContent(
-    userPreferences: UserPreferences,
+    settingPreferences: SettingPreferences,
     onThemeChange: (String) -> Unit,
     onLanguageChange: (String) -> Unit,
-    onNotificationsToggle: (Boolean) -> Unit
+    onNotificationsToggle: (Boolean) -> Unit,
+    onLogout: () -> Unit // New logout callback
 ) {
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(30.dp)
+    ) {
         Text(
             text = "Settings",
             style = MaterialTheme.typography.headlineMedium,
@@ -90,9 +118,9 @@ fun SettingsContent(
         SettingsOption(
             icon = Icons.Outlined.Menu,
             title = "Theme",
-            value = userPreferences.theme,
+            value = settingPreferences.theme,
             onClick = {
-                val newTheme = when (userPreferences.theme) {
+                val newTheme = when (settingPreferences.theme) {
                     "Light" -> "Dark"
                     "Dark" -> "System Default"
                     else -> "Light"
@@ -105,9 +133,9 @@ fun SettingsContent(
         SettingsOption(
             icon = Icons.Outlined.Info,
             title = "Language",
-            value = userPreferences.language,
+            value = settingPreferences.language,
             onClick = {
-                val newLanguage = when (userPreferences.language) {
+                val newLanguage = when (settingPreferences.language) {
                     "English" -> "Arabic"
                     "Arabic" -> "French"
                     else -> "English"
@@ -135,7 +163,7 @@ fun SettingsContent(
                 modifier = Modifier.weight(1f)
             )
             Switch(
-                checked = userPreferences.notificationsEnabled,
+                checked = settingPreferences.notificationsEnabled,
                 onCheckedChange = onNotificationsToggle
             )
         }
@@ -148,6 +176,16 @@ fun SettingsContent(
                 .padding(vertical = 8.dp)
         ) {
             Text("Manage Account")
+        }
+
+        // Logout Button
+        Button(
+            onClick = onLogout, // Logout logic
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+        ) {
+            Text("Logout")
         }
     }
 }

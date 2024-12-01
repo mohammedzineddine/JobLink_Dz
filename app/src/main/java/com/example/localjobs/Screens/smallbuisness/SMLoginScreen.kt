@@ -40,7 +40,7 @@ class SMLoginScreen : Screen {
         ) {
             // App Logo or Image
             Image(
-                painter = painterResource(id = R.drawable.mobile_login), // Replace with your logo
+                painter = painterResource(id = R.drawable.undraw_factory), // Replace with your logo
                 contentDescription = "App Logo",
                 modifier = Modifier.size(250.dp)
             )

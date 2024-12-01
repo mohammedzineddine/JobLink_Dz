@@ -53,9 +53,21 @@ android {
 dependencies {
     implementation ("cafe.adriel.voyager:voyager-navigator:1.0.0-rc06")
     implementation ("cafe.adriel.voyager:voyager-bottom-sheet-navigator:1.0.0-rc06")
-
+    implementation("io.coil-kt:coil-compose:2.4.0")
     implementation ("androidx.datastore:datastore-preferences:1.1.1")
     implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+
+    implementation ("com.google.android.gms:play-services-auth:20.7.0")
+
+    implementation ("androidx.compose.material:material-icons-extended:1.5.0")
+
+
+    implementation ("io.insert-koin:koin-android:3.5.0")
+    implementation ("io.insert-koin:koin-androidx-compose:3.5.0")
+    implementation ("io.insert-koin:koin-androidx-workmanager:3.5.0") // Optional, for WorkManager
+
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -71,6 +83,10 @@ dependencies {
     implementation(libs.annotations)
     implementation(libs.annotations)
     implementation(libs.annotations)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.animation.core.lint)
+    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

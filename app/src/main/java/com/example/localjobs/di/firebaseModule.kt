@@ -1,4 +1,4 @@
-package com.example.localjobs.pref
+package com.example.localjobs.di
 
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.dsl.module

@@ -7,47 +7,61 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.Modifier
 import com.example.localjobs.pref.PreferencesManager
-import com.example.localjobs.pref.UserPreferences
+import com.example.localjobs.pref.SettingPreferences
+import com.google.firebase.auth.FirebaseAuth
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.localjobs.Screens.SplashScreen
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import com.example.localjobs.Screens.user.HomeScreen
+import org.koin.java.KoinJavaComponent.inject as koinInject
 
 class MainActivity : ComponentActivity() {
+
+    private val auth: FirebaseAuth by koinInject(FirebaseAuth::class.java)
+    private val preferencesManager: PreferencesManager by koinInject(PreferencesManager::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val preferencesManager = PreferencesManager(applicationContext)
         val preferencesFlow = preferencesManager.preferencesFlow
 
         setContent {
-            // Observe the selected theme preference and set the theme accordingly
-            val preferences by preferencesFlow.collectAsState(initial = UserPreferences("System Default", "English", true))
+            val preferences by preferencesFlow.collectAsState(initial = SettingPreferences("System Default", "English", true))
 
             val darkTheme = when (preferences.theme) {
                 "Dark" -> true
                 "Light" -> false
-                else -> isSystemInDarkTheme() // System Default
+                else -> isSystemInDarkTheme()
             }
 
-            // Apply the selected theme dynamically
-            MaterialTheme(
-                colorScheme = if (darkTheme) darkColorScheme() else lightColorScheme()
-            ) {
+            MaterialTheme(colorScheme = if (darkTheme) darkColorScheme() else lightColorScheme()) {
+                val user = auth.currentUser
+
+                // Check if the user is logged in from preferences
+                val isLoggedIn = preferencesManager.isUserLoggedIn.collectAsState(initial = false).value
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Navigator(SplashScreen())
-                    Modifier.padding(innerPadding) // To respect the inner padding of Scaffold
+                    Navigator(
+                        screen = when {
+                            user != null -> {
+                                // If the Firebase user is logged in, navigate to the Home Screen
+                                HomeScreen()
+                            }
+                            isLoggedIn -> {
+                                // If the user is logged in in Preferences, navigate to Home
+                                HomeScreen()
+                            }
+                            else -> {
+                                // If the user is not logged in, navigate to the Login Screen
+                                SplashScreen()
+                            }
+                        }
+                    )
+                    Modifier.padding(innerPadding)
                 }
             }
         }

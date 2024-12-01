@@ -1,11 +1,15 @@
 package com.example.localjobs.Screens
 
+import UserLoginScreen
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -14,9 +18,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.R
+import com.example.localjobs.Screens.admin.AdminLoginScreen
 import com.example.localjobs.Screens.smallbuisness.SMLoginScreen
 import com.example.localjobs.Screens.smallbuisness.SMRegisterScreen
-import com.example.localjobs.Screens.user.UserLoginScreen
+
 import com.example.localjobs.Screens.user.UserRegisterScreen
 
 class RegisterLoginScreen : Screen {
@@ -102,86 +107,193 @@ class RegisterLoginScreen : Screen {
 
 // User Role Screen
 class UserRoleScreen : Screen {
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("User Login and Register", style = MaterialTheme.typography.headlineMedium)
+            // App Logo
+            Image(
+                painter = painterResource(id = R.drawable.undraw_people), // Replace with your logo
+                contentDescription = "App Logo",
+                modifier = Modifier.size(270.dp)
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Welcome Text
+            Text(
+                text = "Local Jobs",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Instruction Text
+            Text(
+                text = "Get started Now:",
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             // Register Button
             Button(
-                onClick = {
-                /* Navigate to User Registration */
-                    navigator.push(UserRegisterScreen())
-
-                },
-                modifier = Modifier.fillMaxWidth().height(48.dp)
+                onClick = { navigator.push(UserRegisterScreen()) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("Register")
+                Text(
+                    text = "Register",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Login Button
-            Button(
+            OutlinedButton(
                 onClick = { navigator.push(UserLoginScreen()) },
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(24.dp),
+
             ) {
-                Text("Login")
+                Text(
+                    text = "Login",
+                    fontWeight = FontWeight.Bold
+                )
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Footer Text
+            Text(
+                text = "Already have an account? Login now!",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }
 
-// Small Business Role Screen
+
 class SmallBusinessRoleScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Small Business Login and Register", style = MaterialTheme.typography.headlineMedium)
+            // App Logo or Header Image
+            Image(
+                painter = painterResource(id = R.drawable.univlogo), // Replace with actual image resource
+                contentDescription = "Small Business Logo",
+                modifier = Modifier.size(120.dp)
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Screen Title
+            Text(
+                text = "Small Business Role",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Instruction Text
+            Text(
+                text = "Access your account or register your business:",
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Register Button
             Button(
-                onClick = {
-                    navigator.push(SMRegisterScreen())
-                },
-                modifier = Modifier.fillMaxWidth().height(48.dp)
+                onClick = { navigator.push(SMRegisterScreen()) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
-                Text("Register")
+                Text(
+                    text = "Register",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Login Button
-            Button(
-                onClick = { navigator.push(SMLoginScreen())},
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
+            // Login Button (OutlinedButton)
+            OutlinedButton(
+                onClick = { navigator.push(SMLoginScreen()) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.secondary,
+                    containerColor = Color.Transparent
+                ),
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary)
             ) {
-                Text("Login")
+                Text(
+                    text = "Login",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold
+                )
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Footer Text
+            Text(
+                text = "Already registered? Login to manage your business.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }
 
+
 // Admin Login Screen (Only Login)
-class AdminLoginScreen : Screen {
+class AdminRoleLoginScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -197,7 +309,10 @@ class AdminLoginScreen : Screen {
 
             // Login Button
             Button(
-                onClick = { navigator.push(AdminLoginScreen())},
+                onClick = {
+                    // Navigate to the Admin Dashboard or Home screen (replace with your target screen)
+                    navigator.push(AdminLoginScreen()) // Update this with the correct screen
+                },
                 modifier = Modifier.fillMaxWidth().height(48.dp),
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
             ) {

@@ -1,15 +1,11 @@
 package com.example.localjobs.Screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +24,11 @@ class IntroScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+
+        // Disable back button functionality
+        BackHandler {
+            // Do nothing to block the back button
+        }
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -83,13 +84,13 @@ class IntroScreen : Screen {
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
+
                 IconButton(onClick = { navigator.push(SettingsScreen()) }) {
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Settings"
                     )
                 }
-
             }
         }
     }

@@ -1,7 +1,8 @@
-package com.example.localjobs.di
+package com.example.localjobs
 
 import android.app.Application
-import com.example.localjobs.pref.firebaseModule
+import com.example.localjobs.di.appModule
+import com.example.localjobs.di.firebaseModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -11,8 +12,10 @@ class MyApp : Application() {
 
         startKoin {
             androidContext(this@MyApp)
+            modules(
+                listOf(appModule, firebaseModule),
+            )
 
-            modules(listOf(appModule, firebaseModule))
         }
     }
 }
