@@ -21,7 +21,6 @@ class PreferencesManager(context: Context) {
         val LANGUAGE_KEY = stringPreferencesKey("language")
         val NOTIFICATIONS_KEY = booleanPreferencesKey("notifications")
         val IS_LOGGED_IN_KEY = booleanPreferencesKey("is_logged_in")
-        val USER_EMAIL_KEY = stringPreferencesKey("user_email")
         val USER_NAME_KEY = stringPreferencesKey("user_name") // New key for user's name
     }
 

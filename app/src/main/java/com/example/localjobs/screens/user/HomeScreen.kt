@@ -1,20 +1,55 @@
-package com.example.localjobs.Screens.user
+package com.example.localjobs.screens.user
 
-import UserLoginScreen
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.runtime.*
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,10 +63,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.Data.Job
+import com.example.localjobs.JobPost.PostJobScreen
 import com.example.localjobs.R
-import com.example.localjobs.Screens.IntroScreen
 import com.example.localjobs.Screens.SettingsScreen
 import com.example.localjobs.di.JobListViewModel
+import com.example.localjobs.screens.IntroScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.delay
@@ -45,18 +81,19 @@ class HomeScreen : Screen {
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeScreenContent() {
     val context = LocalContext.current
     val navigator = LocalNavigator.currentOrThrow
     val coroutineScope = rememberCoroutineScope()
     var exitFlag by remember { mutableStateOf(false) }
-    var fullName by remember { mutableStateOf("user") }
+    var fullName by remember { mutableStateOf("") }
     val viewModel: JobListViewModel = koinViewModel()
     val jobs by viewModel.jobs.collectAsState()
     val currentUser = FirebaseAuth.getInstance().currentUser
 
-    // Fetch the user's full name from Firebase
+    // Fetch the user's full name and role from Firebase
     LaunchedEffect(currentUser) {
         currentUser?.uid?.let { userId ->
             val database = FirebaseDatabase.getInstance().getReference("Users")
@@ -71,10 +108,9 @@ fun HomeScreenContent() {
     // Handle back press for exit
     BackHandler {
         if (exitFlag) {
-            android.os.Process.killProcess(android.os.Process.myPid())
+            navigator.popUntilRoot()
         } else {
             exitFlag = true
-            Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
             coroutineScope.launch {
                 delay(2000)
                 exitFlag = false
@@ -82,50 +118,83 @@ fun HomeScreenContent() {
         }
     }
 
+    var selectedTab by remember { mutableIntStateOf(0) }
+
     Scaffold(
-        topBar = { DashboardTopBar(onSettingsClick = { navigator.push(SettingsScreen()) }) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navigator.push(PostJobScreen()) },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Post a Job")
+            }
+        },
+        bottomBar = {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ) {
+                NavigationBarItem(
+                    selected = selectedTab == 0,
+                    onClick = { selectedTab = 0 },
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    label = { Text("Home") }
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 },
+                    icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                    label = { Text("Search") }
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 2,
+                    onClick = { selectedTab = 2 },
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+                    label = { Text("Profile") }
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 3,
+                    onClick = { selectedTab = 3 },
+                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                    label = { Text("Settings") }
+                )
+            }
+        },
         content = { paddingValues ->
-            DashboardContent(
-                modifier = Modifier.padding(paddingValues),
-                fullName = fullName,
-                jobs = jobs,
-                onJobClick = { job -> navigator.push(UserJobDetailsScreen(job)) },
-                onProfileClick = { /* Navigate to Profile Screen */ },
-                onLogoutClick = { navigator.replace(IntroScreen()) }
-            )
+            AnimatedContent(
+                targetState = selectedTab,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(400)) with  fadeOut(animationSpec = tween(400))
+                }, label = ""
+            ) { targetTab ->
+                when (targetTab) {
+                    0 -> HomeContent(
+                        modifier = Modifier.padding(paddingValues),
+                        fullName = fullName,
+                        jobs = jobs,
+                        onJobClick = { job -> navigator.push(UserJobDetailsScreen(job)) },
+                        onProfileClick = { navigator.push(ProfileSettingsScreen()) },
+                        onLogoutClick = { navigator.replace(IntroScreen()) },
+                        onServicesClick = { navigator.push(ServicesScreen()) }
+                    )
+                    1 -> MapScreen().Content()
+                    2 -> ProfileSettingsScreen().Content()
+                    3 -> SettingsScreen().Content()
+                }
+            }
         }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardTopBar(onSettingsClick: () -> Unit) {
-    TopAppBar(
-        title = {
-            Text(
-                text = "Dashboard",
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontSize = 22.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            )
-        },
-        actions = {
-            IconButton(onClick = onSettingsClick) {
-                Icon(Icons.Default.Settings, contentDescription = "Settings")
-            }
-        },
-    )
-}
-
-@Composable
-fun DashboardContent(
+fun HomeContent(
     modifier: Modifier = Modifier,
     fullName: String,
     jobs: List<Job>,
     onJobClick: (Job) -> Unit,
     onProfileClick: () -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    onServicesClick: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -135,11 +204,11 @@ fun DashboardContent(
         // Greeting Section with animation
         AnimatedVisibility(
             visible = true,
-            enter = androidx.compose.animation.expandIn(tween(600)),
-            exit = androidx.compose.animation.fadeOut(tween(400))
+            enter = expandIn(tween(600)),
+            exit = fadeOut(tween(400))
         ) {
             Text(
-                text = "Welcome back, $fullName!",
+                text = "Welcome $fullName!",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
@@ -148,17 +217,23 @@ fun DashboardContent(
             )
         }
 
-        // Dashboard Widgets (Removed Saved Jobs)
+        // Dashboard Widgets
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            DashboardWidget(
+            HomeWidget(
                 title = "Total Jobs",
                 value = jobs.size.toString(),
                 color = MaterialTheme.colorScheme.primaryContainer
+            )
+            ServicesWidget(
+                title = "Services",
+                value = "3",
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                onClick = onServicesClick
             )
         }
 
@@ -199,7 +274,35 @@ fun DashboardContent(
 }
 
 @Composable
-fun DashboardWidget(title: String, value: String, color: Color) {
+fun ServicesWidget(title: String, value: String, color: Color, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(0.80f)
+            .height(100.dp)
+            .padding(horizontal = 8.dp)
+            .clickable(onClick = onClick),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = color)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = title, style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun HomeWidget(title: String, value: String, color: Color) {
     Card(
         modifier = Modifier
             .fillMaxWidth(0.45f)
@@ -275,11 +378,11 @@ fun JobCard(job: Job, onClick: (Job) -> Unit) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = job.title, style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp))
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = job.description, style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = job.location, style = MaterialTheme.typography.bodySmall)
+            Text(text = job.title, style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = job.description, style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Location: ${job.location}", style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -288,12 +391,9 @@ fun JobCard(job: Job, onClick: (Job) -> Unit) {
 fun LogoutButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        shape = MaterialTheme.shapes.medium,
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
     ) {
-        Text(text = "Logout", color = MaterialTheme.colorScheme.onErrorContainer)
+        Text(text = "Logout", color = Color.White)
     }
 }

@@ -1,4 +1,4 @@
-package com.example.localjobs.Screens
+package com.example.localjobs.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*

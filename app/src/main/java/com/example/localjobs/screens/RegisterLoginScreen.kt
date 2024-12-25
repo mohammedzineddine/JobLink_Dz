@@ -1,12 +1,23 @@
-package com.example.localjobs.Screens
+package com.example.localjobs.screens
 
-import UserLoginScreen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,17 +29,15 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.R
-import com.example.localjobs.Screens.admin.AdminLoginScreen
-import com.example.localjobs.Screens.smallbuisness.SMLoginScreen
-import com.example.localjobs.Screens.smallbuisness.SMRegisterScreen
-
-import com.example.localjobs.Screens.user.UserRegisterScreen
+import com.example.localjobs.screens.technician.TechLoginScreen
+import com.example.localjobs.screens.technician.TechRegisterScreen
+import com.example.localjobs.screens.user.UserLoginScreen
+import com.example.localjobs.screens.user.UserRegisterScreen
 
 class RegisterLoginScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val selectedRole = remember { mutableStateOf<String?>(null) }
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -69,26 +78,18 @@ class RegisterLoginScreen : Screen {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Button(
-                    onClick = { selectedRole.value = "User"; navigator.push(UserRoleScreen()) },
+                    onClick = { navigator.push(UserRoleScreen()) },
                     modifier = Modifier.fillMaxWidth().height(48.dp)
                 ) {
                     Text("User")
                 }
 
                 Button(
-                    onClick = { selectedRole.value = "Small Business"; navigator.push(SmallBusinessRoleScreen()) },
+                    onClick = { navigator.push(TechnicianRoleScreen()) },
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
                 ) {
-                    Text("Small Business")
-                }
-
-                Button(
-                    onClick = { selectedRole.value = "Admin"; navigator.push(AdminLoginScreen()) },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary)
-                ) {
-                    Text("Admin")
+                    Text("Technician")
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -105,9 +106,7 @@ class RegisterLoginScreen : Screen {
     }
 }
 
-// User Role Screen
 class UserRoleScreen : Screen {
-
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -175,7 +174,6 @@ class UserRoleScreen : Screen {
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(24.dp),
-
             ) {
                 Text(
                     text = "Login",
@@ -196,8 +194,7 @@ class UserRoleScreen : Screen {
     }
 }
 
-
-class SmallBusinessRoleScreen : Screen {
+class TechnicianRoleScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -220,7 +217,7 @@ class SmallBusinessRoleScreen : Screen {
 
             // Screen Title
             Text(
-                text = "Small Business Role",
+                text = "Technician Role",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
@@ -241,7 +238,7 @@ class SmallBusinessRoleScreen : Screen {
 
             // Register Button
             Button(
-                onClick = { navigator.push(SMRegisterScreen()) },
+                onClick = { navigator.push(TechRegisterScreen()) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -260,7 +257,7 @@ class SmallBusinessRoleScreen : Screen {
 
             // Login Button (OutlinedButton)
             OutlinedButton(
-                onClick = { navigator.push(SMLoginScreen()) },
+                onClick = { navigator.push(TechLoginScreen()) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -287,37 +284,6 @@ class SmallBusinessRoleScreen : Screen {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp)
             )
-        }
-    }
-}
-
-
-// Admin Login Screen (Only Login)
-class AdminRoleLoginScreen : Screen {
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("Admin Login", style = MaterialTheme.typography.headlineMedium)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Login Button
-            Button(
-                onClick = {
-                    // Navigate to the Admin Dashboard or Home screen (replace with your target screen)
-                    navigator.push(AdminLoginScreen()) // Update this with the correct screen
-                },
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
-            ) {
-                Text("Login")
-            }
         }
     }
 }

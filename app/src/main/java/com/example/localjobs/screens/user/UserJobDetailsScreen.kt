@@ -1,11 +1,12 @@
-package com.example.localjobs.Screens.user
+package com.example.localjobs.screens.user
+
+
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -16,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import com.example.localjobs.Data.Job
 import com.example.localjobs.R
+
 
 class UserJobDetailsScreen(private val job: Job) : Screen {
 
@@ -52,7 +54,11 @@ class UserJobDetailsScreen(private val job: Job) : Screen {
             )
 
             // Divider
-            Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+                thickness = 1.dp,
+                color = Color.Gray
+            )
 
             // Job Location
             Text(
@@ -61,19 +67,6 @@ class UserJobDetailsScreen(private val job: Job) : Screen {
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            // Job Pay Range
-            Text(
-                text = "Pay Range: ${job.payRange}",
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            // Job Posted By
-            Text(
-                text = "Posted By: ${job.postedBy}",
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp),
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
         }
     }
 }

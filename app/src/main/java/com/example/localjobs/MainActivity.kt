@@ -14,8 +14,8 @@ import com.example.localjobs.pref.PreferencesManager
 import com.example.localjobs.pref.SettingPreferences
 import com.google.firebase.auth.FirebaseAuth
 import cafe.adriel.voyager.navigator.Navigator
-import com.example.localjobs.Screens.SplashScreen
-import com.example.localjobs.Screens.user.HomeScreen
+import com.example.localjobs.screens.SplashScreen
+import com.example.localjobs.screens.user.HomeScreen
 import org.koin.java.KoinJavaComponent.inject as koinInject
 
 class MainActivity : ComponentActivity() {
@@ -66,4 +66,5 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 }
