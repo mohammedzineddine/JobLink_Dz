@@ -5,17 +5,22 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.navigator.Navigator
 import com.example.localjobs.pref.PreferencesManager
 import com.example.localjobs.pref.SettingPreferences
+import com.example.localjobs.screen.splashScreen
+
+import com.example.localjobs.screen.user.HomeScreen
 import com.google.firebase.auth.FirebaseAuth
-import cafe.adriel.voyager.navigator.Navigator
-import com.example.localjobs.screens.SplashScreen
-import com.example.localjobs.screens.user.HomeScreen
 import org.koin.java.KoinJavaComponent.inject as koinInject
 
 class MainActivity : ComponentActivity() {
@@ -48,7 +53,7 @@ class MainActivity : ComponentActivity() {
                     Navigator(
                         screen = when {
                             user != null -> {
-                                // If the Firebase user is logged in, navigate to the Home Screen
+                                // If the Firebase user is logged in, navigate to the Home screen
                                 HomeScreen()
                             }
                             isLoggedIn -> {
@@ -56,8 +61,8 @@ class MainActivity : ComponentActivity() {
                                 HomeScreen()
                             }
                             else -> {
-                                // If the user is not logged in, navigate to the Login Screen
-                                SplashScreen()
+                                // If the user is not logged in, navigate to the Login screen
+                                splashScreen()
                             }
                         }
                     )

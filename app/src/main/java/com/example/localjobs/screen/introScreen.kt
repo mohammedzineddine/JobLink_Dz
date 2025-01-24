@@ -1,4 +1,4 @@
-package com.example.localjobs.screens
+package com.example.localjobs.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -32,7 +32,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.R
 import com.example.localjobs.Screens.SettingsScreen
 
-class IntroScreen : Screen {
+class introScreen : Screen {
 
     @Composable
     override fun Content() {

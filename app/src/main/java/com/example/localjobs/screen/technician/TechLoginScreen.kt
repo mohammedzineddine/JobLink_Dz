@@ -1,4 +1,4 @@
-package com.example.localjobs.screens.technician
+package com.example.localjobs.screen.technician
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -31,7 +31,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.R
-import com.example.localjobs.screens.user.UserLoginScreen
+import com.example.localjobs.screen.user.UserLoginScreen
 
 class TechLoginScreen : Screen {
 

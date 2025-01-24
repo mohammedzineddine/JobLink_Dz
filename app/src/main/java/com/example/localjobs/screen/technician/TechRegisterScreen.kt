@@ -1,4 +1,4 @@
-package com.example.localjobs.screens.technician
+package com.example.localjobs.screen.technician
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image

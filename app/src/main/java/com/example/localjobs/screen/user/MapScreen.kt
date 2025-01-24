@@ -1,4 +1,4 @@
-package com.example.localjobs.screens.user
+package com.example.localjobs.screen.user
 
 import android.Manifest
 import android.content.Context
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.FloatingActionButton
@@ -31,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -53,7 +55,7 @@ public class MapScreen : Screen {
 
 @Composable
 fun OSMDroidMap() {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     var locationName by remember { mutableStateOf("No location selected") }
     var mapCenter by remember { mutableStateOf(GeoPoint(36.7538, 3.0588)) } // Default location (Algiers)
@@ -83,8 +85,25 @@ fun OSMDroidMap() {
                     mapCenter = GeoPoint(location.latitude, location.longitude)
                     locationName = "Current Location: (${location.latitude}, ${location.longitude})"
                 } else {
-                    Toast.makeText(context, "Unable to fetch location", Toast.LENGTH_SHORT).show()
+                    // Request location updates if last location is null
+                    val locationRequest = com.google.android.gms.location.LocationRequest.create().apply {
+                        priority = com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
+                        interval = 10000
+                        fastestInterval = 5000
+                    }
+                    fusedLocationClient.requestLocationUpdates(locationRequest, object : com.google.android.gms.location.LocationCallback() {
+                        override fun onLocationResult(locationResult: com.google.android.gms.location.LocationResult) {
+                            val location = locationResult.lastLocation
+                            if (location != null) {
+                                mapCenter = GeoPoint(location.latitude, location.longitude)
+                                locationName = "Current Location: (${location.latitude}, ${location.longitude})"
+                                fusedLocationClient.removeLocationUpdates(this)
+                            }
+                        }
+                    }, null)
                 }
+            }.addOnFailureListener { e ->
+                Toast.makeText(context, "Failed to get location: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         } else {
             Toast.makeText(context, "Location permission not granted", Toast.LENGTH_SHORT).show()
@@ -143,7 +162,6 @@ fun OSMDroidMap() {
                 .padding(horizontal = 16.dp)
                 .padding(top = 48.dp) // Push the search bar down
                 .align(Alignment.TopCenter)
-
         ) {
             Surface(
                 shape = RoundedCornerShape(50), // Highly rounded corners
@@ -160,7 +178,7 @@ fun OSMDroidMap() {
                     trailingIcon = {
                         IconButton(onClick = { searchLocation(searchQuery.text) }) {
                             Icon(
-                                imageVector = androidx.compose.material.icons.Icons.Default.Search,
+                                imageVector = Icons.Default.Search,
                                 contentDescription = "Search"
                             )
                         }
@@ -183,7 +201,7 @@ fun OSMDroidMap() {
             contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
             Icon(
-                imageVector = androidx.compose.material.icons.Icons.Default.MyLocation,
+                imageVector = Icons.Filled.MyLocation,
                 contentDescription = "Current Location"
             )
         }

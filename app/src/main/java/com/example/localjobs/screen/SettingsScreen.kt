@@ -1,9 +1,12 @@
 package com.example.localjobs.Screens
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,9 +16,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,14 +37,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import com.example.localjobs.screen.RegisterLoginScreen
 import com.example.localjobs.pref.PreferencesManager
 import com.example.localjobs.pref.SettingPreferences
-import com.example.localjobs.screens.IntroScreen
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import java.util.Locale
-
 
 class SettingsScreen : Screen {
 
@@ -82,15 +85,15 @@ class SettingsScreen : Screen {
                 // Sign out the user
                 firebaseAuth.signOut()
                 // Navigate to login screen after logout
-                navigator?.push(IntroScreen()) // Assuming you have UserLoginScreen
+                navigator?.push(RegisterLoginScreen())
             }
         )
     }
 
     private fun updateLocale(context: Context, language: String) {
         val locale = when (language) {
-            "Arabic" -> Locale("values-ar-DZ")
-            "French" -> Locale("values-fr-FR")
+            "Arabic" -> Locale("ar")
+            "French" -> Locale("fr")
             else -> Locale("en") // Default to English
         }
 
@@ -98,14 +101,15 @@ class SettingsScreen : Screen {
         val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
 
-        // Update the locale using createConfigurationContext
-        context.createConfigurationContext(config)
+        // Update the configuration for the context
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
     }
 
     private fun restartActivity(context: Context) {
-        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val intent = Intent(context, SettingsScreen::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
+        (context as? Activity)?.finish() // Finish the current activity
     }
 }
 
@@ -115,8 +119,10 @@ fun SettingsContent(
     onThemeChange: (String) -> Unit,
     onLanguageChange: (String) -> Unit,
     onNotificationsToggle: (Boolean) -> Unit,
-    onLogout: () -> Unit // New logout callback
+    onLogout: () -> Unit
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -130,7 +136,7 @@ fun SettingsContent(
 
         // Theme Selection
         SettingsOption(
-            icon = Icons.Outlined.Menu,
+            icon = Icons.Filled.LightMode,
             title = "Theme",
             value = settingPreferences.theme,
             onClick = {
@@ -145,7 +151,7 @@ fun SettingsContent(
 
         // Language Selection
         SettingsOption(
-            icon = Icons.Outlined.Info,
+            icon = Icons.Filled.Language,
             title = "Language",
             value = settingPreferences.language,
             onClick = {
@@ -166,7 +172,7 @@ fun SettingsContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Outlined.Notifications,
+                imageVector = Icons.Filled.Notifications,
                 contentDescription = "Notifications",
                 modifier = Modifier.size(24.dp)
             )
@@ -194,12 +200,32 @@ fun SettingsContent(
 
         // Logout Button
         Button(
-            onClick = onLogout, // Logout logic
+            onClick = onLogout,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
         ) {
             Text("Logout")
+        }
+
+        // GitHub Icon with Link (below Logout button)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Link,
+                contentDescription = "GitHub",
+                modifier = Modifier
+                    .size(32.dp)
+                    .clickable {
+                        // Open GitHub link in browser
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/mohammedzineddine"))
+                        context.startActivity(intent)
+                    }
+            )
         }
     }
 }

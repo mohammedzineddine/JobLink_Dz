@@ -15,7 +15,6 @@ class MyApp : Application() {
             modules(
                 listOf(appModule, firebaseModule),
             )
-
         }
     }
 }

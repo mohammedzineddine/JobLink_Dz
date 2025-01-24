@@ -1,4 +1,4 @@
-package com.example.localjobs.screens.user
+package com.example.localjobs.screen.user
 
 import android.net.Uri
 import android.widget.Toast
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
@@ -21,7 +20,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -98,14 +96,14 @@ fun ProfileSettingsScreenContent() {
         topBar = {
             TopAppBar(
                 title = { Text("Profile Settings") },
-                navigationIcon = {
+               /* navigationIcon = {
                     IconButton(onClick = { navigator.pop() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBackIosNew,
                             contentDescription = "Back"
                         )
                     }
-                }
+                }*/
             )
         },
         content = { paddingValues ->

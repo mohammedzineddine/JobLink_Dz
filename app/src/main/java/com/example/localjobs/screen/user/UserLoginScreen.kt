@@ -1,4 +1,4 @@
-package com.example.localjobs.screens.user
+package com.example.localjobs.screen.user
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -167,10 +167,10 @@ class UserLoginScreen : Screen {
                     if (email.isNotEmpty()) {
                         auth.sendPasswordResetEmail(email)
                             .addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    errorMessage = "Password reset email sent to $email."
+                                errorMessage = if (task.isSuccessful) {
+                                    "Password reset email sent to $email."
                                 } else {
-                                    errorMessage = "Error: ${task.exception?.message}"
+                                    "Error: ${task.exception?.message}"
                                 }
                             }
                     } else {

@@ -1,4 +1,4 @@
-package com.example.localjobs.screens
+package com.example.localjobs.screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -29,10 +29,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.R
-import com.example.localjobs.screens.technician.TechLoginScreen
-import com.example.localjobs.screens.technician.TechRegisterScreen
-import com.example.localjobs.screens.user.UserLoginScreen
-import com.example.localjobs.screens.user.UserRegisterScreen
+import com.example.localjobs.screen.technician.TechLoginScreen
+import com.example.localjobs.screen.technician.TechRegisterScreen
+import com.example.localjobs.screen.user.UserLoginScreen
+import com.example.localjobs.screen.user.UserRegisterScreen
 
 class RegisterLoginScreen : Screen {
     @Composable
@@ -208,14 +208,14 @@ class TechnicianRoleScreen : Screen {
         ) {
             // App Logo or Header Image
             Image(
-                painter = painterResource(id = R.drawable.univlogo), // Replace with actual image resource
+                painter = painterResource(id = R.drawable.undraw_factory), // Replace with actual image resource
                 contentDescription = "Small Business Logo",
                 modifier = Modifier.size(120.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Screen Title
+            // screen Title
             Text(
                 text = "Technician Role",
                 style = MaterialTheme.typography.headlineMedium,

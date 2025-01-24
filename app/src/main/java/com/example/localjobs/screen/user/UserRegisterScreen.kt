@@ -1,4 +1,4 @@
-package com.example.localjobs.screens.user
+package com.example.localjobs.screen.user
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

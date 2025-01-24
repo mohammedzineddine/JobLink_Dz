@@ -17,7 +17,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
-            useSupportLibrary = true
+            useSupportLibrary = false
         }
     }
 
@@ -28,6 +28,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
@@ -64,7 +65,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
 
     // Datastore Preferences
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.datastore:datastore-preferences:1.1.2")
 
     // Lifecycle Runtime
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
@@ -82,7 +83,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     // Compose Material
-    implementation("androidx.compose.material:material-icons-extended:1.5.0")
+    implementation("androidx.compose.material:material-icons-extended:1.7.6")
 
     // Koin for dependency injection
     implementation("io.insert-koin:koin-android:3.5.0")
@@ -110,6 +111,7 @@ dependencies {
     implementation(libs.androidx.navigation.common.ktx)
     implementation(libs.play.services.location)
     implementation ("com.google.accompanist:accompanist-swiperefresh:0.30.1")
+    implementation ("androidx.compose.material:material-icons-extended:1.7.6")
 
     // Testing
     testImplementation(libs.junit)
@@ -119,6 +121,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+
+
 
 
 

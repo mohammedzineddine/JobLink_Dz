@@ -1,4 +1,4 @@
-package com.example.localjobs.screens.user
+package com.example.localjobs.screen.user
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -25,9 +25,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -67,7 +67,7 @@ import com.example.localjobs.JobPost.PostJobScreen
 import com.example.localjobs.R
 import com.example.localjobs.Screens.SettingsScreen
 import com.example.localjobs.di.JobListViewModel
-import com.example.localjobs.screens.IntroScreen
+import com.example.localjobs.screen.introScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.delay
@@ -137,7 +137,7 @@ fun HomeScreenContent() {
                 NavigationBarItem(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
                     label = { Text("Home") }
                 )
                 NavigationBarItem(
@@ -149,7 +149,7 @@ fun HomeScreenContent() {
                 NavigationBarItem(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+                    icon = { Icon(Icons.Filled.AccountCircle, contentDescription = "Profile") },
                     label = { Text("Profile") }
                 )
                 NavigationBarItem(
@@ -174,7 +174,7 @@ fun HomeScreenContent() {
                         jobs = jobs,
                         onJobClick = { job -> navigator.push(UserJobDetailsScreen(job)) },
                         onProfileClick = { navigator.push(ProfileSettingsScreen()) },
-                        onLogoutClick = { navigator.replace(IntroScreen()) },
+                        onLogoutClick = { navigator.replace(introScreen()) },
                         onServicesClick = { navigator.push(ServicesScreen()) }
                     )
                     1 -> MapScreen().Content()

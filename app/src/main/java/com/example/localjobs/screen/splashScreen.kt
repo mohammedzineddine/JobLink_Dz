@@ -1,7 +1,9 @@
-package com.example.localjobs.screens
+package com.example.localjobs.screen
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -11,11 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import kotlinx.coroutines.delay
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.R
+import kotlinx.coroutines.delay
 
-class SplashScreen : Screen {
+class splashScreen : Screen {
 
     @Composable
     override fun Content() {
@@ -37,10 +39,10 @@ class SplashScreen : Screen {
                 )
             }
 
-            // Navigate to IntroScreen after a delay
+            // Navigate to introScreen after a delay
             LaunchedEffect (Unit) {
                 delay(2000) // 2-second delay
-                navigator.push(IntroScreen())
+                navigator.push(introScreen())
             }
         }
     }
