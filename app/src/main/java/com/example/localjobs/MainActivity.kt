@@ -18,10 +18,14 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.example.localjobs.pref.PreferencesManager
 import com.example.localjobs.pref.SettingPreferences
 import com.example.localjobs.screen.splashScreen
-
+import com.example.localjobs.screen.technician.HomeTch
 import com.example.localjobs.screen.user.HomeScreen
 import com.google.firebase.auth.FirebaseAuth
+
 import org.koin.java.KoinJavaComponent.inject as koinInject
+
+
+
 
 class MainActivity : ComponentActivity() {
 
@@ -32,10 +36,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val preferencesFlow = preferencesManager.preferencesFlow
-
         setContent {
-            val preferences by preferencesFlow.collectAsState(initial = SettingPreferences("System Default", "English", true))
+            val preferences by preferencesManager.preferencesFlow.collectAsState(
+                initial = SettingPreferences("System Default", "English", true, "Guest", "", "")
+            )
 
             val darkTheme = when (preferences.theme) {
                 "Dark" -> true
@@ -45,25 +49,27 @@ class MainActivity : ComponentActivity() {
 
             MaterialTheme(colorScheme = if (darkTheme) darkColorScheme() else lightColorScheme()) {
                 val user = auth.currentUser
-
-                // Check if the user is logged in from preferences
                 val isLoggedIn = preferencesManager.isUserLoggedIn.collectAsState(initial = false).value
+
+                // 🔹 Correctly Retrieve User Role
+                val userRole by preferencesManager.userRole.collectAsState(initial = "Technicians")
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Navigator(
                         screen = when {
                             user != null -> {
-                                // If the Firebase user is logged in, navigate to the Home screen
-                                HomeScreen()
+                                when (userRole) {
+                                    "Technicians" -> HomeTch() // Technician home screen
+                                    else -> HomeScreen() // Default to user home screen
+                                }
                             }
                             isLoggedIn -> {
-                                // If the user is logged in in Preferences, navigate to Home
-                                HomeScreen()
+                                when (userRole) {
+                                    "Technicians" -> HomeTch()
+                                    else -> HomeScreen()
+                                }
                             }
-                            else -> {
-                                // If the user is not logged in, navigate to the Login screen
-                                splashScreen()
-                            }
+                            else -> splashScreen() // Login/registration flow
                         }
                     )
                     Modifier.padding(innerPadding)
@@ -71,5 +77,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 }

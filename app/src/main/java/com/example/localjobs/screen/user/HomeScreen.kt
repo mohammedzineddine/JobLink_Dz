@@ -63,10 +63,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.Data.Job
-import com.example.localjobs.JobPost.PostJobScreen
 import com.example.localjobs.R
 import com.example.localjobs.Screens.SettingsScreen
 import com.example.localjobs.di.JobListViewModel
+import com.example.localjobs.jobPost.PostJobScreen
 import com.example.localjobs.screen.introScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -74,7 +74,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-class HomeScreen : Screen {
+open class HomeScreen : Screen {
     @Composable
     override fun Content() {
         HomeScreenContent()
@@ -100,7 +100,7 @@ fun HomeScreenContent() {
             database.child(userId).get().addOnSuccessListener { snapshot ->
                 fullName = snapshot.child("fullName").value as? String ?: "User"
             }.addOnFailureListener {
-                Toast.makeText(context, "Failed to load user data", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Failed to load your data", Toast.LENGTH_SHORT).show()
             }
         }
     }

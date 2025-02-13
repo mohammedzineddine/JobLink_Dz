@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
+
 }
 
 android {
@@ -17,7 +18,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
-            useSupportLibrary = false
+            useSupportLibrary = true // Changed to true for better compatibility
         }
     }
 
@@ -70,14 +71,10 @@ dependencies {
     // Lifecycle Runtime
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 
-    // Mapbox
-
-    implementation ("org.osmdroid:osmdroid-android:6.1.14")
-    implementation ("com.google.android.gms:play-services-maps:17.0.0")
-    implementation ("com.google.android.gms:play-services-location:17.0.0")
-
-
-
+    // OSM droid Maps
+    implementation("org.osmdroid:osmdroid-android:6.1.14")
+    implementation("com.google.android.gms:play-services-maps:17.0.0")
+    implementation("com.google.android.gms:play-services-location:17.0.0")
 
     // Play Services
     implementation("com.google.android.gms:play-services-auth:20.7.0")
@@ -99,6 +96,9 @@ dependencies {
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.storage.ktx)
 
+    // Preferences
+    implementation("me.zhanghai.compose.preference:library:1.1.1")
+
     // AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -109,9 +109,17 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.common.ktx)
-    implementation(libs.play.services.location)
-    implementation ("com.google.accompanist:accompanist-swiperefresh:0.30.1")
-    implementation ("androidx.compose.material:material-icons-extended:1.7.6")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.30.1")
+    implementation(libs.androidx.runtime.livedata)
+
+    //
+    // Retrofit for network requests
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // OkHttp for logging (optional)
+    implementation ("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
 
     // Testing
     testImplementation(libs.junit)
@@ -121,10 +129,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-
-
-
-
-
 }

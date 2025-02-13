@@ -16,10 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,9 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import com.example.localjobs.screen.RegisterLoginScreen
 import com.example.localjobs.pref.PreferencesManager
 import com.example.localjobs.pref.SettingPreferences
+import com.example.localjobs.screen.RegisterLoginScreen
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -52,12 +54,11 @@ class SettingsScreen : Screen {
         val navigator = LocalNavigator.current
         val context = LocalContext.current
 
-        // Use Koin to inject PreferencesManager and FirebaseAuth
         val preferencesManager: PreferencesManager = koinInject()
         val firebaseAuth: FirebaseAuth = koinInject()
 
         val preferences by preferencesManager.preferencesFlow.collectAsState(
-            initial = SettingPreferences("System Default", "English", true)
+            initial = SettingPreferences("System Default", "English", true , "Guest", "", "")
         )
 
         val coroutineScope = rememberCoroutineScope()
@@ -72,8 +73,8 @@ class SettingsScreen : Screen {
             onLanguageChange = { language ->
                 coroutineScope.launch {
                     preferencesManager.updateLanguage(language)
-                    updateLocale(context, language) // Change locale
-                    restartActivity(context) // Restart activity to apply changes
+                    updateLocale(context, language)
+                    restartActivity(context)
                 }
             },
             onNotificationsToggle = { enabled ->
@@ -82,10 +83,14 @@ class SettingsScreen : Screen {
                 }
             },
             onLogout = {
-                // Sign out the user
-                firebaseAuth.signOut()
-                // Navigate to login screen after logout
-                navigator?.push(RegisterLoginScreen())
+                coroutineScope.launch {
+                    // Sign out from Firebase
+                    firebaseAuth.signOut()
+                    // Clear login state in PreferencesManager
+                    preferencesManager.saveLoginState(false, "", "technician")
+                    // Navigate to the login screen
+                    navigator?.replace(RegisterLoginScreen())
+                }
             }
         )
     }
@@ -94,22 +99,20 @@ class SettingsScreen : Screen {
         val locale = when (language) {
             "Arabic" -> Locale("ar")
             "French" -> Locale("fr")
-            else -> Locale("en") // Default to English
+            else -> Locale("en")
         }
-
         Locale.setDefault(locale)
+
         val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
-
-        // Update the configuration for the context
-        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+        context.createConfigurationContext(config)
     }
 
     private fun restartActivity(context: Context) {
-        val intent = Intent(context, SettingsScreen::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
-        (context as? Activity)?.finish() // Finish the current activity
+        (context as? Activity)?.finish()
     }
 }
 
@@ -134,9 +137,15 @@ fun SettingsContent(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Theme Selection
+        // Theme Selection with Dynamic Icon
+        val themeIcon = when (settingPreferences.theme) {
+            "Light" -> Icons.Filled.LightMode
+            "Dark" -> Icons.Filled.DarkMode
+            else -> Icons.Filled.Settings
+        }
+
         SettingsOption(
-            icon = Icons.Filled.LightMode,
+            icon = themeIcon,
             title = "Theme",
             value = settingPreferences.theme,
             onClick = {
@@ -208,7 +217,7 @@ fun SettingsContent(
             Text("Logout")
         }
 
-        // GitHub Icon with Link (below Logout button)
+        // GitHub Icon with Link
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -221,7 +230,6 @@ fun SettingsContent(
                 modifier = Modifier
                     .size(32.dp)
                     .clickable {
-                        // Open GitHub link in browser
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/mohammedzineddine"))
                         context.startActivity(intent)
                     }

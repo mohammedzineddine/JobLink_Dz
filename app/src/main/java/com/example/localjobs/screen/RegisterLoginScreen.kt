@@ -2,8 +2,10 @@ package com.example.localjobs.screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -29,7 +33,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.R
-import com.example.localjobs.screen.technician.TechLoginScreen
+import com.example.localjobs.screen.tech.TechLoginScreen
 import com.example.localjobs.screen.technician.TechRegisterScreen
 import com.example.localjobs.screen.user.UserLoginScreen
 import com.example.localjobs.screen.user.UserRegisterScreen
@@ -46,18 +50,20 @@ class RegisterLoginScreen : Screen {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 32.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
+                    .padding(horizontal = 24.dp, vertical = 8.dp), // Reduced vertical padding
+                verticalArrangement = Arrangement.Top, // Align content to the top
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // App Logo or Image
                 Image(
                     painter = painterResource(id = R.drawable.decide_re),
                     contentDescription = "App Logo",
-                    modifier = Modifier.size(400.dp)
+                    modifier = Modifier
+                        .size(250.dp) // Reduced size for better spacing
+                        .padding(top = 8.dp) // Added minimal top padding
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp)) // Reduced spacing
 
                 // Heading
                 Text(
@@ -66,7 +72,7 @@ class RegisterLoginScreen : Screen {
                     fontWeight = FontWeight.Bold,
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(8.dp)) // Reduced spacing
 
                 // Role Selection Buttons
                 Text(
@@ -77,30 +83,94 @@ class RegisterLoginScreen : Screen {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Button(
-                    onClick = { navigator.push(UserRoleScreen()) },
-                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                // User Role Card
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp) // Increased height for better visibility
+                        .clickable { navigator.push(UserRoleScreen()) },
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
-                    Text("User")
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "You're Looking for an Artisan?",
+                                fontSize = 22.sp, // Larger font size
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Find and hire the best local Artisans for your needs.",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                        }
+                        Image(
+                            painter = painterResource(id = R.drawable.user),
+                            contentDescription = "User Icon",
+                            modifier = Modifier.size(120.dp)
+                        )
+                    }
                 }
 
-                Button(
-                    onClick = { navigator.push(TechnicianRoleScreen()) },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
+                Spacer(modifier = Modifier.height(8.dp)) // Reduced spacing
+
+                // Technician Role Card
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp) // Increased height for better visibility
+                        .clickable { navigator.push(TechnicianRoleScreen()) },
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
-                    Text("Technician")
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "You're an Artisan?",
+                                fontSize = 22.sp, // Larger font size
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Showcase your skills and connect with clients in your area.",
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                        }
+                        Image(
+                            painter = painterResource(id = R.drawable.technician),
+                            contentDescription = "Technician Icon",
+                            modifier = Modifier.size(120.dp)
+                        )
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(8.dp)) // Reduced spacing
 
                 // Informational Footer
                 Text(
                     text = "By continuing, you agree to our Terms of Service and Privacy Policy",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
+
             }
         }
     }
@@ -215,7 +285,7 @@ class TechnicianRoleScreen : Screen {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // screen Title
+            // Screen Title
             Text(
                 text = "Technician Role",
                 style = MaterialTheme.typography.headlineMedium,
@@ -238,7 +308,7 @@ class TechnicianRoleScreen : Screen {
 
             // Register Button
             Button(
-                onClick = { navigator.push(TechRegisterScreen()) },
+                onClick = { navigator.replace(TechRegisterScreen()) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

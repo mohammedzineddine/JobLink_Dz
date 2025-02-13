@@ -20,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -95,7 +96,11 @@ fun ProfileSettingsScreenContent() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profile Settings") },
+                title = { Text(
+                    text = "Profile Settings",
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                ) },
                /* navigationIcon = {
                     IconButton(onClick = { navigator.pop() }) {
                         Icon(
@@ -104,6 +109,7 @@ fun ProfileSettingsScreenContent() {
                         )
                     }
                 }*/
+
             )
         },
         content = { paddingValues ->

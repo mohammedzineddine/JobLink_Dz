@@ -1,4 +1,5 @@
 package com.example.localjobs.screen.user
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -39,6 +40,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.R
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 class UserLoginScreen : Screen {
 
@@ -46,6 +49,7 @@ class UserLoginScreen : Screen {
     override fun Content() {
         val auth = FirebaseAuth.getInstance()
         val navigator = LocalNavigator.currentOrThrow
+        val database = Firebase.database.reference
 
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
@@ -140,14 +144,31 @@ class UserLoginScreen : Screen {
                         isLoading = true
                         auth.signInWithEmailAndPassword(email, password)
                             .addOnCompleteListener { task ->
-                                isLoading = false
+                                isLoading = false // Reset loading state
                                 if (task.isSuccessful) {
-                                    // Navigate to user home screen
-                                    navigator.replace(HomeScreen())
+                                    val userId = auth.currentUser?.uid
+                                    if (userId != null) {
+                                        // Check if user exists in Users
+                                        database.child("Users").child(userId)
+                                            .get()
+                                            .addOnSuccessListener { snapshot ->
+                                                if (snapshot.exists()) {
+                                                    navigator.push(HomeScreen())
+                                                } else {
+                                                    errorMessage = "You are not registered as a user"
+                                                }
+                                            }
+                                            .addOnFailureListener { e ->
+                                                errorMessage = "Failed to fetch user data: ${e.message}"
+                                            }
+                                    } else {
+                                        errorMessage = "User ID is null."
+                                    }
                                 } else {
                                     errorMessage = "Authentication failed: ${task.exception?.message}"
                                 }
                             }
+
                     } else {
                         errorMessage = "Please fill in both fields."
                     }
@@ -179,7 +200,6 @@ class UserLoginScreen : Screen {
                 }
             )
 
-
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
@@ -191,5 +211,3 @@ class UserLoginScreen : Screen {
         }
     }
 }
-
-

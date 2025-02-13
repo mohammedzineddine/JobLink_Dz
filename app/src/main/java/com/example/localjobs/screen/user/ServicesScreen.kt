@@ -1,6 +1,4 @@
-
 package com.example.localjobs.screen.user
-
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -12,7 +10,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,7 +31,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.R
 import com.example.localjobs.Screens.SettingsScreen
-
 
 class ServicesScreen : Screen {
     @Composable
@@ -52,7 +52,8 @@ fun ServicesScreenContent() {
         topBar = {
             DashboardTopBar(
                 onSettingsClick = { navigator.push(SettingsScreen()) },
-                onMapClick = { navigator.push(MapScreen()) } // Navigate to the MapScreen
+                onMapClick = { navigator.push(MapScreen()) }, // Navigate to the MapScreen
+                onBackClick = { navigator.pop() }
             )
         },
         content = { paddingValues ->
@@ -92,19 +93,33 @@ fun ServiceCard(serviceName: String, imageRes: Int) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardTopBar(onSettingsClick: () -> Unit, onMapClick: () -> Unit) {
+fun DashboardTopBar(onSettingsClick: () -> Unit, onMapClick: () -> Unit, onBackClick: () -> Unit) {
     TopAppBar(
         title = { Text("Services") },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+        },
         actions = {
             // Map Icon
             IconButton(onClick = onMapClick) {
                 Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Filled.Map,
+                    imageVector = Icons.Default.Map,
                     contentDescription = "Current Location"
                 )
             }
             // Settings Icon
-
+            IconButton(onClick = onSettingsClick) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings"
+                )
+            }
         }
     )
 }
+

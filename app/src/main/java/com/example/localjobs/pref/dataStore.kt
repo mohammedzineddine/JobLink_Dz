@@ -1,77 +1,99 @@
 package com.example.localjobs.pref
 
 import android.content.Context
-import androidx.datastore.preferences.core.*
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import androidx.datastore.core.DataStore
 
 // DataStore extension for accessing preferences
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
 class PreferencesManager(context: Context) {
 
-    // Access to the data store
     private val dataStore: DataStore<Preferences> = context.dataStore
 
-    // Preference keys
     companion object {
-        val THEME_KEY = stringPreferencesKey("theme")
-        val LANGUAGE_KEY = stringPreferencesKey("language")
-        val NOTIFICATIONS_KEY = booleanPreferencesKey("notifications")
-        val IS_LOGGED_IN_KEY = booleanPreferencesKey("is_logged_in")
-        val USER_NAME_KEY = stringPreferencesKey("user_name") // New key for user's name
+        private val THEME_KEY = stringPreferencesKey("theme")
+        private val LANGUAGE_KEY = stringPreferencesKey("language")
+        private val NOTIFICATIONS_KEY = booleanPreferencesKey("notifications")
+        private val IS_LOGGED_IN_KEY = booleanPreferencesKey("is_logged_in")
+        private val USER_NAME_KEY = stringPreferencesKey("user_name")
+        private val USER_ID_KEY = stringPreferencesKey("user_id")
+        private val USER_ROLE_KEY = stringPreferencesKey("user_role") // Key for user role
     }
 
-    // Flow to get all preferences
+    // Flow to get preferences
     val preferencesFlow: Flow<SettingPreferences> = dataStore.data.map { preferences ->
-        val theme = preferences[THEME_KEY] ?: "System Default"
-        val language = preferences[LANGUAGE_KEY] ?: "English"
-        val notifications = preferences[NOTIFICATIONS_KEY] ?: true
-        val userName = preferences[USER_NAME_KEY] ?: "Guest" // Default name
-        SettingPreferences(theme, language, notifications, userName)
+        SettingPreferences(
+            theme = preferences[THEME_KEY] ?: "System Default",
+            language = preferences[LANGUAGE_KEY] ?: "English",
+            notificationsEnabled = preferences[NOTIFICATIONS_KEY] ?: true,
+            userName = preferences[USER_NAME_KEY] ?: "Guest",
+            userId = preferences[USER_ID_KEY] ?: "",
+            userRole = preferences[USER_ROLE_KEY] ?: "" // Default to empty string instead of "technician"
+        )
     }
 
-    // Save preferences
+    // Save user preferences
     suspend fun updateTheme(theme: String) {
-        dataStore.edit { preferences ->
-            preferences[THEME_KEY] = theme
-        }
+        dataStore.edit { it[THEME_KEY] = theme }
     }
 
     suspend fun updateLanguage(language: String) {
-        dataStore.edit { preferences ->
-            preferences[LANGUAGE_KEY] = language
-        }
+        dataStore.edit { it[LANGUAGE_KEY] = language }
     }
 
     suspend fun updateNotifications(enabled: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[NOTIFICATIONS_KEY] = enabled
+        dataStore.edit { it[NOTIFICATIONS_KEY] = enabled }
+    }
+
+    // Save user role
+    suspend fun updateUserRole(userRole: String) {
+        dataStore.edit { it[USER_ROLE_KEY] = userRole }
+    }
+
+    // Clear all preferences (e.g., on logout)
+    suspend fun clearPreferences() {
+        dataStore.edit { it.clear() }
+    }
+
+    // Save login state and user details
+    suspend fun saveLoginState(isLoggedIn: Boolean, userId: String?, userRole: String) {
+        dataStore.edit {
+            it[IS_LOGGED_IN_KEY] = isLoggedIn
+            it[USER_ID_KEY] = userId ?: ""
+            it[USER_ROLE_KEY] = userRole // Save user role persistently
         }
     }
 
-    // Get login state
-    val isUserLoggedIn: Flow<Boolean> = dataStore.data.map { preferences ->
-        preferences[IS_LOGGED_IN_KEY] ?: false
+    // Get user role immediately (not a Flow)
+    suspend fun getUserRole(): String {
+        val preferences = dataStore.data.first() // Reads once synchronously
+        return preferences[USER_ROLE_KEY] ?: "" // Return empty string if no role is found
     }
 
+    // Get login state as a Flow
+    val isUserLoggedIn: Flow<Boolean> = dataStore.data.map { it[IS_LOGGED_IN_KEY] ?: false }
+
+    // Get user ID as a Flow
+    val userId: Flow<String> = dataStore.data.map { it[USER_ID_KEY] ?: "" }
+
+    // Get user role as a Flow
+    val userRole: Flow<String> = dataStore.data.map { it[USER_ROLE_KEY] ?: "" } // Default to empty string
 }
 
-// Data class to hold user preferences
+// Data class to hold preferences
 data class SettingPreferences(
     val theme: String,
     val language: String,
     val notificationsEnabled: Boolean,
     val userName: String,
-) {
-    constructor(theme: String, language: String, notificationsEnabled: Boolean) : this(
-        theme = theme,
-        language = language,
-        notificationsEnabled = notificationsEnabled,
-        userName = "Guest"
-    )
-
-
-}
+    val userId: String,
+    val userRole: String // User role is included here
+)

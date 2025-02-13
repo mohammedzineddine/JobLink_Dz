@@ -21,6 +21,7 @@ firebaseDatabaseKtx = "21.0.0"
 firebaseStorageKtx = "21.0.1"
 playServicesMaps = "19.0.0"
 playServicesLocation = "21.3.0"
+runtimeLivedata = "1.7.7"
 
 [libraries]
 android-v10110 = { module = "com.mapbox.maps:android", version.ref = "android" }
@@ -49,6 +50,7 @@ firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage
 maps-android = { module = "com.mapbox.maps:android", version.ref = "androidVersion" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
