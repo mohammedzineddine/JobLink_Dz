@@ -58,6 +58,9 @@ android {
 }
 
 dependencies {
+
+    implementation("androidx.compose.material3:material3:1.3.1") // Latest stable version
+    implementation("androidx.compose.material3:material3-window-size-class:1.3.1")
     // Voyager for navigation
     implementation("cafe.adriel.voyager:voyager-navigator:1.0.0-rc06")
     implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:1.0.0-rc06")
@@ -120,6 +123,11 @@ dependencies {
     // OkHttp for logging (optional)
     implementation ("com.squareup.okhttp3:okhttp:4.9.3")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
+    //Notification
+    implementation("com.google.firebase:firebase-messaging-ktx:23.3.1")
+    implementation(libs.androidx.ui.text.google.fonts)
+
 
     // Testing
     testImplementation(libs.junit)

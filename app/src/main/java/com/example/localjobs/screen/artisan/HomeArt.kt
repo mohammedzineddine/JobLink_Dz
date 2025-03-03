@@ -1,4 +1,4 @@
-package com.example.localjobs.screen.technician
+package com.example.localjobs.screen.artisan
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -56,11 +56,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.Data.Job
 import com.example.localjobs.Screens.SettingsScreen
 import com.example.localjobs.di.JobListViewModel
+import com.example.localjobs.screen.MapScreen
 import com.example.localjobs.screen.introScreen
 import com.example.localjobs.screen.user.HomeScreen
 import com.example.localjobs.screen.user.HomeWidget
 import com.example.localjobs.screen.user.LogoutButton
-import com.example.localjobs.screen.user.MapScreen
 import com.example.localjobs.screen.user.ProfileSettingsScreen
 import com.example.localjobs.screen.user.ServicesScreen
 import com.example.localjobs.screen.user.ServicesWidget
@@ -71,7 +71,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-class HomeTch : HomeScreen() {
+class HomeArt : HomeScreen() {
 
     @Composable
     override fun Content() {

@@ -51,7 +51,7 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-public class ProfileSettingsScreen : Screen {
+class ProfileSettingsScreen : Screen {
     @Composable
     override fun Content() {
         ProfileSettingsScreenContent()

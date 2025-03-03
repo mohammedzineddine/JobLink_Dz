@@ -36,7 +36,7 @@ class PreferencesManager(context: Context) {
             notificationsEnabled = preferences[NOTIFICATIONS_KEY] ?: true,
             userName = preferences[USER_NAME_KEY] ?: "Guest",
             userId = preferences[USER_ID_KEY] ?: "",
-            userRole = preferences[USER_ROLE_KEY] ?: "" // Default to empty string instead of "technician"
+            userRole = preferences[USER_ROLE_KEY] ?: "" // Default to empty string instead of "artisan"
         )
     }
 

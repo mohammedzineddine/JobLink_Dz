@@ -1,4 +1,4 @@
-package com.example.localjobs.screen.technician
+package com.example.localjobs.screen.artisan
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -57,7 +57,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.R
-import com.example.localjobs.screen.user.HomeScreen
 import com.example.localjobs.screen.user.UserLoginScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -65,14 +64,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class TechRegisterScreen : Screen {
+class ArtisanRegisterScreen : Screen {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val auth = FirebaseAuth.getInstance()
         val navigator = LocalNavigator.currentOrThrow
-        val database = FirebaseDatabase.getInstance().getReference("Technicians")
+        val database = FirebaseDatabase.getInstance().getReference("Artisans")
         val context = LocalContext.current
 
         var fullName by remember { mutableStateOf("") }
@@ -95,7 +94,7 @@ class TechRegisterScreen : Screen {
         val sexOptions = listOf("Male", "Female")
 
         // State for date picker
-        var showDatePicker by remember { mutableStateOf(false) }
+        var showDatePicker by remember { mutableStateOf(true) }
         val datePickerState = rememberDatePickerState()
 
         // Wrap the entire content in a Scrollable Column
@@ -117,7 +116,7 @@ class TechRegisterScreen : Screen {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("Create a Technician Account", style = MaterialTheme.typography.headlineMedium)
+            Text("Create a artisan Account", style = MaterialTheme.typography.headlineMedium)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -408,8 +407,8 @@ class TechRegisterScreen : Screen {
                                 if (task.isSuccessful) {
                                     val userId = task.result.user?.uid
                                     if (userId != null) {
-                                        // Save technician data to Firebase Database
-                                        val technician = mapOf(
+                                        // Save artisan data to Firebase Database
+                                        val Artisan = mapOf(
                                             "fullName" to fullName,
                                             "email" to email,
                                             "phoneNumber" to phoneNumber,
@@ -417,14 +416,15 @@ class TechRegisterScreen : Screen {
                                             "sex" to sex,
                                             "skills" to skills,
                                             "experience" to experience,
-                                            "certifications" to certifications
+                                            "certifications" to certifications,
+                                            "password" to password
                                         )
-                                        database.child(userId).setValue(technician)
+                                        database.child(userId).setValue(Artisan)
                                             .addOnCompleteListener { dbTask ->
                                                 if (dbTask.isSuccessful) {
-                                                    navigator.push(HomeScreen()) // Navigate to HomeScreen after successful registration
+                                                    navigator.push(HomeArt())
                                                 } else {
-                                                    errorMessage = "Failed to save technician data: ${dbTask.exception?.message}"
+                                                    errorMessage = "Failed to save artisan data: ${dbTask.exception?.message}"
                                                 }
                                             }
                                     }

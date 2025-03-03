@@ -17,14 +17,11 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.localjobs.pref.PreferencesManager
 import com.example.localjobs.pref.SettingPreferences
+import com.example.localjobs.screen.artisan.HomeArt
 import com.example.localjobs.screen.splashScreen
-import com.example.localjobs.screen.technician.HomeTch
 import com.example.localjobs.screen.user.HomeScreen
 import com.google.firebase.auth.FirebaseAuth
-
 import org.koin.java.KoinJavaComponent.inject as koinInject
-
-
 
 
 class MainActivity : ComponentActivity() {
@@ -52,20 +49,20 @@ class MainActivity : ComponentActivity() {
                 val isLoggedIn = preferencesManager.isUserLoggedIn.collectAsState(initial = false).value
 
                 // 🔹 Correctly Retrieve User Role
-                val userRole by preferencesManager.userRole.collectAsState(initial = "Technicians")
+                val userRole by preferencesManager.userRole.collectAsState(initial = "Users")
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Navigator(
                         screen = when {
                             user != null -> {
                                 when (userRole) {
-                                    "Technicians" -> HomeTch() // Technician home screen
+                                    "Artisans" -> HomeArt() // Technician home screen
                                     else -> HomeScreen() // Default to user home screen
                                 }
                             }
                             isLoggedIn -> {
                                 when (userRole) {
-                                    "Technicians" -> HomeTch()
+                                    "Artisans" -> HomeArt()
                                     else -> HomeScreen()
                                 }
                             }

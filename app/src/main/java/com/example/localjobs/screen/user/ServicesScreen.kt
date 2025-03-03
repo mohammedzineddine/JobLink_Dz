@@ -31,6 +31,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.R
 import com.example.localjobs.Screens.SettingsScreen
+import com.example.localjobs.screen.MapScreen
 
 class ServicesScreen : Screen {
     @Composable

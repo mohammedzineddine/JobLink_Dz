@@ -44,13 +44,13 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.R
-import com.example.localjobs.screen.technician.HomeTch
-import com.example.localjobs.screen.technician.TechRegisterScreen
+import com.example.localjobs.screen.artisan.ArtisanRegisterScreen
+import com.example.localjobs.screen.artisan.HomeArt
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
-class TechLoginScreen : Screen {
+class ArtisanLoginScreen : Screen {
 
     @Composable
     override fun Content() {
@@ -165,23 +165,23 @@ class TechLoginScreen : Screen {
                                 isLoading = false
                                 if (task.isSuccessful) {
                                     // Fetch tech data from Realtime Database
-                                    val techId = auth.currentUser?.uid
-                                    if (techId != null) {
-                                        database.child("Technicians").child(techId).get()
+                                    val ArtId = auth.currentUser?.uid
+                                    if (ArtId != null) {
+                                        database.child("Artisans").child(ArtId).get()
                                             .addOnSuccessListener { dataSnapshot ->
                                                 val techData = dataSnapshot.value as? Map<*, *>
                                                 if (techData != null) {
                                                     // Navigate to tech home screen with tech data
-                                                    navigator.replace(HomeTch())
+                                                    navigator.replace(HomeArt())
                                                 } else {
-                                                    errorMessage = "Tech data not found."
+                                                    errorMessage = "artisan data not found."
                                                 }
                                             }
                                             .addOnFailureListener { e ->
                                                 errorMessage = "Failed to fetch tech data: ${e.message}"
                                             }
                                     } else {
-                                        errorMessage = "Tech ID is null."
+                                        errorMessage = "artisan ID is null."
                                     }
                                 } else {
                                     errorMessage = "Authentication failed: ${task.exception?.message}"
@@ -221,7 +221,7 @@ class TechLoginScreen : Screen {
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = { navigator.push(TechRegisterScreen()) },
+                onClick = { navigator.push(ArtisanRegisterScreen()) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Don't have an account? Sign Up")

@@ -1,6 +1,5 @@
 package com.example.localjobs.screen
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,11 +37,6 @@ class introScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
 
-        // Disable back button functionality
-        BackHandler {
-            // Do nothing to block the back button
-        }
-
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
@@ -59,9 +53,10 @@ class introScreen : Screen {
 
                 // Introductory Image or Logo
                 Image(
-                    painter = painterResource(id = R.drawable.welcome_cats), // Replace with your image resource
+                    painter = painterResource(id = R.drawable.interview_re), // Replace with your image resource
                     contentDescription = "Intro Logo",
-                    modifier = Modifier.size(300.dp)
+                    modifier = Modifier.size(300.dp),
+
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

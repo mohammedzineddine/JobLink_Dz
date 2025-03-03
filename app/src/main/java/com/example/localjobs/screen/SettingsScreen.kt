@@ -87,7 +87,7 @@ class SettingsScreen : Screen {
                     // Sign out from Firebase
                     firebaseAuth.signOut()
                     // Clear login state in PreferencesManager
-                    preferencesManager.saveLoginState(false, "", "technician")
+                    preferencesManager.clearPreferences()
                     // Navigate to the login screen
                     navigator?.replace(RegisterLoginScreen())
                 }
@@ -129,7 +129,7 @@ fun SettingsContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(30.dp)
+            .padding(16.dp)
     ) {
         Text(
             text = "Settings",

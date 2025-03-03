@@ -9,10 +9,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.with
-import androidx.compose.foundation.Image
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -35,9 +35,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -54,19 +54,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.Data.Job
-import com.example.localjobs.R
 import com.example.localjobs.Screens.SettingsScreen
 import com.example.localjobs.di.JobListViewModel
 import com.example.localjobs.jobPost.PostJobScreen
+import com.example.localjobs.screen.MapScreen
 import com.example.localjobs.screen.introScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -112,7 +110,7 @@ fun HomeScreenContent() {
         } else {
             exitFlag = true
             coroutineScope.launch {
-                delay(2000)
+                delay(500)
                 exitFlag = false
             }
         }
@@ -121,37 +119,62 @@ fun HomeScreenContent() {
     var selectedTab by remember { mutableIntStateOf(0) }
 
     Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navigator.push(PostJobScreen()) },
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Post a Job")
-            }
-        },
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.onSurface
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp) // Adjusted height
+                    .padding(bottom = 16.dp) // Adjusted padding
+                    .background(MaterialTheme.colorScheme.inversePrimary),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
+                // Home Button
                 NavigationBarItem(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
                     icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
                     label = { Text("Home") }
                 )
+
+                // Search Button
                 NavigationBarItem(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
                     icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                     label = { Text("Search") }
                 )
+
+                // Centered Post Job Button
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    FloatingActionButton(
+                        onClick = { navigator.push(PostJobScreen()) },
+                        modifier = Modifier.size(50.dp),
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        elevation = FloatingActionButtonDefaults.elevation(10.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Post a Job",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
+
+                // Profile Button
                 NavigationBarItem(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
                     icon = { Icon(Icons.Filled.AccountCircle, contentDescription = "Profile") },
                     label = { Text("Profile") }
                 )
+
+                // Settings Button
                 NavigationBarItem(
                     selected = selectedTab == 3,
                     onClick = { selectedTab = 3 },
@@ -164,7 +187,7 @@ fun HomeScreenContent() {
             AnimatedContent(
                 targetState = selectedTab,
                 transitionSpec = {
-                    fadeIn(animationSpec = tween(400)) with  fadeOut(animationSpec = tween(400))
+                    fadeIn(animationSpec = tween(400)) togetherWith fadeOut(animationSpec = tween(400))
                 }, label = ""
             ) { targetTab ->
                 when (targetTab) {
@@ -173,7 +196,6 @@ fun HomeScreenContent() {
                         fullName = fullName,
                         jobs = jobs,
                         onJobClick = { job -> navigator.push(UserJobDetailsScreen(job)) },
-                        onProfileClick = { navigator.push(ProfileSettingsScreen()) },
                         onLogoutClick = { navigator.replace(introScreen()) },
                         onServicesClick = { navigator.push(ServicesScreen()) }
                     )
@@ -192,7 +214,6 @@ fun HomeContent(
     fullName: String,
     jobs: List<Job>,
     onJobClick: (Job) -> Unit,
-    onProfileClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onServicesClick: () -> Unit
 ) {
@@ -236,17 +257,6 @@ fun HomeContent(
                 onClick = onServicesClick
             )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Account Management Section
-        Text(
-            text = "Account Management",
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-
-        ProfileCard(fullName = fullName, onClick = onProfileClick)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -324,45 +334,6 @@ fun HomeWidget(title: String, value: String, color: Color) {
                     fontWeight = FontWeight.Bold
                 )
             )
-        }
-    }
-}
-
-@Composable
-fun ProfileCard(fullName: String, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.male_avatar),
-                contentDescription = "User Profile",
-                modifier = Modifier.size(70.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = fullName,
-                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp)
-                )
-                Text(
-                    text = "Edit your personal details and preferences",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
         }
     }
 }

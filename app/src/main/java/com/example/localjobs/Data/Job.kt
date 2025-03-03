@@ -5,6 +5,8 @@ data class Job(
     val title: String = "",
     val description: String = "",
     val location: String = "",
+    val latitude: Double = 0.0, // Add latitude field
+    val longitude: Double = 0.0, // Add longitude field
     val status: String = "Open", // Default status is "Open"
     val imageUri: String? = null, // Nullable to handle jobs without images
     val videoUri: String? = null, // Nullable to handle jobs without videos
@@ -16,7 +18,6 @@ data class Job(
     val estimatedTime: String = "", // Added estimated time field
     val preferences: String = "" // Added preferences field
 ) {
-
     val priority: Any
         get() {
             return when (status) {
