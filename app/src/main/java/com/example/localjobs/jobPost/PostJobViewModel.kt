@@ -80,6 +80,7 @@ class PostJobViewModel(application: Application) : AndroidViewModel(application)
 
         val jobId = database.push().key
         val job = mapOf(
+            "id" to jobId,
             "userId" to currentUser.uid,
             "title" to title.value,
             "description" to description.value,

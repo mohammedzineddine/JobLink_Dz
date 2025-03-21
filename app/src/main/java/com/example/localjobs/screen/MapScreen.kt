@@ -92,7 +92,7 @@ fun OSMDroidMap() {
         }
 
         // Fetch jobs from Firebase
-        val database = FirebaseDatabase.getInstance().getReference("Jobs")
+        val database = FirebaseDatabase.getInstance().getReference("jobs")
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val jobs = mutableListOf<Job>()

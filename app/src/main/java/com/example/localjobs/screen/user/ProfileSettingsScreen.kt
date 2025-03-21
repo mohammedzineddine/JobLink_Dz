@@ -101,14 +101,14 @@ fun ProfileSettingsScreenContent() {
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.padding(bottom = 16.dp)
                 ) },
-               /* navigationIcon = {
-                    IconButton(onClick = { navigator.pop() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBackIosNew,
-                            contentDescription = "Back"
-                        )
-                    }
-                }*/
+                /* navigationIcon = {
+                     IconButton(onClick = { navigator.pop() }) {
+                         Icon(
+                             imageVector = Icons.Default.ArrowBackIosNew,
+                             contentDescription = "Back"
+                         )
+                     }
+                 }*/
 
             )
         },

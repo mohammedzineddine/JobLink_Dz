@@ -2,6 +2,7 @@ package com.example.localjobs.Data
 
 data class Job(
     val id: String = "",
+    val userId: String="",
     val title: String = "",
     val description: String = "",
     val location: String = "",
@@ -18,6 +19,7 @@ data class Job(
     val estimatedTime: String = "", // Added estimated time field
     val preferences: String = "" // Added preferences field
 ) {
+
     val priority: Any
         get() {
             return when (status) {

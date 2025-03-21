@@ -79,6 +79,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:17.0.0")
     implementation("com.google.android.gms:play-services-location:17.0.0")
 
+
     // Play Services
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 

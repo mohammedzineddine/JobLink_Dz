@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
@@ -28,12 +27,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -41,6 +42,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -61,6 +63,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.localjobs.Data.Job
+import com.example.localjobs.NotificationScreen
 import com.example.localjobs.Screens.SettingsScreen
 import com.example.localjobs.di.JobListViewModel
 import com.example.localjobs.jobPost.PostJobScreen
@@ -72,16 +75,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-open class HomeScreen : Screen {
+open class HomeScreen(private val initialTab: Int = 0, private val job: Job? = null) : Screen {
     @Composable
     override fun Content() {
-        HomeScreenContent()
+        HomeScreenContent(initialTab = initialTab)
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenContent() {
+fun HomeScreenContent(initialTab: Int = 0) {
     val context = LocalContext.current
     val navigator = LocalNavigator.currentOrThrow
     val coroutineScope = rememberCoroutineScope()
@@ -116,15 +119,33 @@ fun HomeScreenContent() {
         }
     }
 
-    var selectedTab by remember { mutableIntStateOf(0) }
+    var selectedTab by remember { mutableIntStateOf(initialTab) }
 
     Scaffold(
+        topBar = {
+            if (selectedTab == 0) {
+                TopAppBar(
+                    title = { Text("Local Jobs") },
+                    actions = {
+                        Icon(
+                            imageVector = Icons.Default.Notifications,
+                            contentDescription = "Notifications",
+                            modifier = Modifier
+                                .clickable {
+                                    navigator.push(NotificationScreen())
+                                }
+                                .padding(16.dp)
+                        )
+                    }
+                )
+            }
+        },
         bottomBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp) // Adjusted height
-                    .padding(bottom = 16.dp) // Adjusted padding
+                    .height(80.dp)
+                    .padding(bottom = 16.dp)
                     .background(MaterialTheme.colorScheme.inversePrimary),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceAround
@@ -262,7 +283,7 @@ fun HomeContent(
 
         // Job List Section with transition
         Text(
-            text = "Jobs Near You",
+            text = "Jobs Nearby",
             style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
             modifier = Modifier.padding(bottom = 12.dp)
         )

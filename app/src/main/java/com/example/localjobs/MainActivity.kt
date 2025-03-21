@@ -20,7 +20,9 @@ import com.example.localjobs.pref.SettingPreferences
 import com.example.localjobs.screen.artisan.HomeArt
 import com.example.localjobs.screen.splashScreen
 import com.example.localjobs.screen.user.HomeScreen
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.messaging
 import org.koin.java.KoinJavaComponent.inject as koinInject
 
 
@@ -30,7 +32,9 @@ class MainActivity : ComponentActivity() {
     private val preferencesManager: PreferencesManager by koinInject(PreferencesManager::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Firebase.messaging.isAutoInitEnabled = true
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
 
         setContent {
