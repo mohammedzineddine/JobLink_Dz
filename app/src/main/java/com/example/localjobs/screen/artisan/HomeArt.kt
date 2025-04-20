@@ -90,19 +90,17 @@ class HomeArt : HomeScreen() {
         val jobs by viewModel.jobs.collectAsState(initial = emptyList())
         val currentUser = FirebaseAuth.getInstance().currentUser
 
-        // Fetch the user's full name and role from Firebase
         LaunchedEffect(currentUser) {
             currentUser?.uid?.let { userId ->
-                val database = FirebaseDatabase.getInstance().getReference("Technicians")
+                val database = FirebaseDatabase.getInstance().getReference("Artisans")
                 database.child(userId).get().addOnSuccessListener { snapshot ->
-                    fullName = snapshot.child("fullName").value as? String ?: "Technician"
+                    fullName = snapshot.child("fullName").value as? String ?: "Artisan"
                 }.addOnFailureListener {
                     Toast.makeText(context, "Failed to load your data", Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
-        // Handle back press for exit
         BackHandler {
             if (exitFlag) {
                 navigator.popUntilRoot()
@@ -161,8 +159,7 @@ class HomeArt : HomeScreen() {
                             modifier = Modifier.padding(paddingValues),
                             fullName = fullName,
                             jobs = jobs,
-                            onJobClick = { job -> navigator.push(UserJobDetailsScreen(job))},
-                            onProfileClick = { navigator.push(ProfileSettingsScreen()) },
+                            onJobClick = { job -> navigator.push(UserJobDetailsScreen(job)) },
                             onLogoutClick = { navigator.replace(introScreen()) },
                             onServicesClick = { navigator.push(ServicesScreen()) }
                         )
@@ -181,7 +178,6 @@ class HomeArt : HomeScreen() {
         fullName: String,
         jobs: List<Job>,
         onJobClick: (Job) -> Unit,
-        onProfileClick: () -> Unit,
         onLogoutClick: () -> Unit,
         onServicesClick: () -> Unit
     ) {
@@ -192,7 +188,6 @@ class HomeArt : HomeScreen() {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Greeting Section with animation
             AnimatedVisibility(
                 visible = true,
                 enter = expandIn(tween(600)),
@@ -208,7 +203,6 @@ class HomeArt : HomeScreen() {
                 )
             }
 
-            // Filter Section
             TextField(
                 value = filter,
                 onValueChange = { filter = it },
@@ -219,7 +213,6 @@ class HomeArt : HomeScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Dashboard Widgets
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -241,7 +234,6 @@ class HomeArt : HomeScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Job List Section
             Text(
                 text = "Jobs Near You",
                 style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
@@ -261,7 +253,6 @@ class HomeArt : HomeScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Logout Button
             LogoutButton(onClick = onLogoutClick)
         }
     }

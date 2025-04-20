@@ -55,20 +55,29 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import java.util.Locale
 
-class MapScreen : Screen {
+class MapScreen(
+    private val targetLatitude: Double? = null,
+    private val targetLongitude: Double? = null
+) : Screen {
     @Composable
     override fun Content() {
-        OSMDroidMap()
+        OSMDroidMap(targetLatitude, targetLongitude)
     }
 }
 
 @Composable
-fun OSMDroidMap() {
+fun OSMDroidMap(targetLatitude: Double? = null, targetLongitude: Double? = null) {
     val context = LocalContext.current
     val navigator = LocalNavigator.currentOrThrow
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     var locationName by remember { mutableStateOf("No location selected") }
-    var mapCenter by remember { mutableStateOf(GeoPoint(36.7538, 3.0588)) } // Default location (Algiers)
+    var mapCenter by remember {
+        if (targetLatitude != null && targetLongitude != null) {
+            mutableStateOf(GeoPoint(targetLatitude, targetLongitude))
+        } else {
+            mutableStateOf(GeoPoint(36.7538, 3.0588)) // Default location (Algiers)
+        }
+    }
     var hasLocationPermission by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
     val categories = listOf("All", "Hospital", "Restaurant", "Shop")
@@ -115,7 +124,7 @@ fun OSMDroidMap() {
         val geocoder = Geocoder(context, Locale.getDefault())
         try {
             val addresses = geocoder.getFromLocationName("$query $category", 1)
-            if (!addresses.isNullOrEmpty()) {
+            if (addresses != null && addresses.isNotEmpty()) {
                 val location = addresses[0]
                 mapCenter = GeoPoint(location.latitude, location.longitude)
                 locationName = location.getAddressLine(0) ?: "Location found"
@@ -157,24 +166,33 @@ fun OSMDroidMap() {
 
                 // Add job location markers
                 jobLocations.forEach { job ->
-                    val marker = Marker(mapView)
-                    val location = GeoPoint(job.latitude, job.longitude)
-                    marker.position = jobLocations.firstOrNull()?.let { location } ?: mapCenter
-                    marker.title = job.title
-                    marker.snippet = job.location
-                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                    marker.setOnMarkerClickListener { _, _ ->
-                        navigator.push(UserJobDetailsScreen(job))
-                        true
+                    if (job.latitude != 0.0 && job.longitude != 0.0) {
+                        val marker = Marker(mapView)
+                        val location = GeoPoint(job.latitude, job.longitude)
+                        marker.position = location
+                        marker.title = job.title
+                        marker.snippet = job.location
+                        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        marker.setOnMarkerClickListener { _, _ ->
+                            navigator.push(UserJobDetailsScreen(job))
+                            true
+                        }
+                        mapView.overlays.add(marker)
                     }
-                    mapView.overlays.add(marker)
                 }
 
-                // Add a marker for the searched location
-                val searchedMarker = Marker(mapView)
-                searchedMarker.position = mapCenter
-                searchedMarker.title = "Selected Location"
-                mapView.overlays.add(searchedMarker)
+                // If a target location was specified, highlight it specially
+                if (targetLatitude != null && targetLongitude != null) {
+                    val highlightedMarker = Marker(mapView)
+                    highlightedMarker.position = GeoPoint(targetLatitude, targetLongitude)
+                    highlightedMarker.title = "Selected Job Location"
+                    highlightedMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    // Make this marker stand out somehow - could change icon or color
+                    mapView.overlays.add(highlightedMarker)
+
+                    // Animate to this position
+                    mapView.controller.animateTo(GeoPoint(targetLatitude, targetLongitude))
+                }
 
                 mapView.invalidate()
             },
@@ -248,7 +266,7 @@ fun OSMDroidMap() {
                 }
             },
             modifier = Modifier
-                .align(Alignment.CenterStart)
+                .align(Alignment.BottomEnd)
                 .padding(16.dp),
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary

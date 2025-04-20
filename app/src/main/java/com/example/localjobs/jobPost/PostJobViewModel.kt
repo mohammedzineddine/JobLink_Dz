@@ -1,119 +1,139 @@
 package com.example.localjobs.jobPost
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.navigator.Navigator
-import com.example.localjobs.supabase.SupabaseApiService
+import com.example.localjobs.Data.Job
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.io.File
-import java.io.FileOutputStream
+import com.google.firebase.storage.FirebaseStorage
+
+private const val TAG = "PostJobViewModel"
 
 class PostJobViewModel(application: Application) : AndroidViewModel(application) {
+    val context = application
 
-    @SuppressLint("StaticFieldLeak")
-    val context = getApplication<Application>().applicationContext
-    private val database = FirebaseDatabase.getInstance().getReference("jobs")
-    private val currentUser = FirebaseAuth.getInstance().currentUser
+    // Job details
+    val title = mutableStateOf("")
+    val description = mutableStateOf("")
+    val location = mutableStateOf("")
+    val phoneNumber = mutableStateOf("")
+    val status = mutableStateOf("Open")
+    val skills = mutableStateOf("Not Specified")
+    val estimatedTime = mutableStateOf("Not Specified")
 
-    var title = mutableStateOf("")
-    var description = mutableStateOf("")
-    var location = mutableStateOf("")
-    var phoneNumber = mutableStateOf("")
-    var imageUri = mutableStateOf<Uri?>(null)
-    var imageUrl = mutableStateOf<String?>(null)
-    var isLoading = mutableStateOf(false)
+    // Location data
+    val latitude = mutableStateOf("")
+    val longitude = mutableStateOf("")
 
-    // Retrofit instance for Supabase
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://gdyegejqcfitkvdmupzf.supabase.co/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    private val supabaseApi = retrofit.create(SupabaseApiService::class.java)
+    // Image related
+    val imageUri = mutableStateOf<Uri?>(null)
+    val isLoading = mutableStateOf(false)
+    private var imageUrl = ""
 
     fun uploadImage() {
-        imageUri.value?.let { uri ->
-            isLoading.value = true
-            val file = uriToFile(uri) ?: return
-            val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-            val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
+        if (imageUri.value == null) {
+            Toast.makeText(context, "Please select an image first", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-            viewModelScope.launch {
-                try {
-                    val response = supabaseApi.uploadImage(file.name, body).execute()
-                    if (response.isSuccessful) {
-                        imageUrl.value = "https://gdyegejqcfitkvdmupzf.supabase.co/storage/v1/object/public/jobs/${file.name}"
-                        Toast.makeText(context, "Image uploaded successfully!", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "Upload failed: ${response.message()}", Toast.LENGTH_SHORT).show()
-                    }
-                } catch (e: Exception) {
-                    Toast.makeText(context, "Upload failed: ${e.message}", Toast.LENGTH_SHORT).show()
-                } finally {
-                    isLoading.value = false
+        isLoading.value = true
+        val storageRef = FirebaseStorage.getInstance().reference
+        val imageRef = storageRef.child("job_images/${System.currentTimeMillis()}.jpg")
+
+        val file = imageUri.value?.let { uriToFile(context, it) }
+        if (file != null) {
+            val uploadTask = imageRef.putFile(Uri.fromFile(file))
+            uploadTask.continueWithTask { task ->
+                if (!task.isSuccessful) {
+                    task.exception?.let { throw it }
+                }
+                imageRef.downloadUrl
+            }.addOnCompleteListener { task ->
+                isLoading.value = false
+                if (task.isSuccessful) {
+                    imageUrl = task.result.toString()
+                    Toast.makeText(context, "Image uploaded successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Failed to upload image: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
+        } else {
+            isLoading.value = false
+            Toast.makeText(context, "Failed to prepare image file", Toast.LENGTH_SHORT).show()
         }
     }
 
     fun postJob(navigator: Navigator?) {
-        if (currentUser == null) {
-            Toast.makeText(context, "User not logged in!", Toast.LENGTH_SHORT).show()
+        // Check if all required fields are filled
+        if (title.value.isBlank() || description.value.isBlank() || location.value.isBlank() || phoneNumber.value.isBlank()) {
+            Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (title.value.isEmpty() || description.value.isEmpty() || location.value.isEmpty()) {
-            Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
+        isLoading.value = true
+
+        // Create a unique job ID
+        val jobId = FirebaseDatabase.getInstance().getReference("jobs").push().key
+        if (jobId == null) {
+            isLoading.value = false
+            Toast.makeText(context, "Failed to create job ID", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val jobId = database.push().key
-        val job = mapOf(
-            "id" to jobId,
-            "userId" to currentUser.uid,
-            "title" to title.value,
-            "description" to description.value,
-            "location" to location.value,
-            "phoneNumber" to phoneNumber.value,
-            "status" to "Open",
-            "imageUrl" to (imageUrl.value ?: "")
+        // Process coordinates with proper error handling
+        val lat = try {
+            latitude.value.toDouble()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error converting latitude: ${e.message}, value: '${latitude.value}'")
+            0.0
+        }
+
+        val lng = try {
+            longitude.value.toDouble()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error converting longitude: ${e.message}, value: '${longitude.value}'")
+            0.0
+        }
+
+        Log.d(TAG, "Saving job with coordinates: lat=$lat, lng=$lng")
+
+        // Create job object
+        val job = Job(
+            id = jobId,
+            title = title.value,
+            description = description.value,
+            location = location.value,
+            phoneNumber = phoneNumber.value,
+            status = status.value,
+            skills = skills.value,
+            estimatedTime = estimatedTime.value,
+            userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
+            latitude = lat,
+            longitude = lng
         )
 
-        jobId?.let {
-            database.child(it).setValue(job)
-                .addOnSuccessListener {
-                    Toast.makeText(context, "Job Posted Successfully!", Toast.LENGTH_SHORT).show()
-                    navigator?.pop()
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(context, "Failed to Post Job: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-        }
-    }
+        // Save to Firebase
+        FirebaseDatabase.getInstance().getReference("jobs").child(jobId).setValue(job)
+            .addOnCompleteListener { task ->
+                isLoading.value = false
+                if (task.isSuccessful) {
+                    // Verify the data was saved correctly
+                    FirebaseDatabase.getInstance().getReference("jobs").child(jobId).get()
+                        .addOnSuccessListener { snapshot ->
+                            val savedJob = snapshot.getValue(Job::class.java)
+                            Log.d(TAG, "Saved job coordinates: lat=${savedJob?.latitude}, lng=${savedJob?.longitude}")
+                        }
 
-    private fun uriToFile(uri: Uri): File? {
-        return try {
-            val fileName = "job_${System.currentTimeMillis()}.jpg"
-            val file = File(context.cacheDir, fileName)
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                FileOutputStream(file).use { outputStream ->
-                    inputStream.copyTo(outputStream)
+                    Toast.makeText(context, "Job posted successfully!", Toast.LENGTH_SHORT).show()
+                    navigator?.pop()
+                } else {
+                    Toast.makeText(context, "Failed to post job: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }
-            file
-        } catch (e: Exception) {
-            null
-        }
     }
 }
