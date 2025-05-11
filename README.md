@@ -23,3 +23,7 @@ mands of modern consumers and workers alike, offering a user-friendly platform t
 the process of hiring and being hired. With the aim of supporting local economies and empow-
 ering individuals, our project stands at the intersection of technology and community, ushering
 in a new era of local job matching for artisans and service providers.
+
+
+
+[https://t.me/moh_zn_34]
