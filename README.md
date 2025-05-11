@@ -26,4 +26,4 @@ in a new era of local job matching for artisans and service providers.
 
 
 
-[https://t.me/moh_zn_34]
+For more infos: https://t.me/moh_zn_34
