@@ -62,7 +62,15 @@ ering individuals, our project stands at the intersection of technology and comm
 
 ##  Overview
 
-<code>❯ REPLACE-ME</code>
+<code>❯1.2 Overview
+ 
+ #State of The Art: In this Part, we will discuss the objectives of this project, study
+ existing solutions, criticize them and propose new solutions.
+ #Project Methods: In this Part, we will discuss the languages, technologies, tools and
+ strategies used in the implementation of this project
+ #Project implementation: In this Part, we will discuss how we, in practice, imple
+mented all the aspects of the project, present the final products through its interface and
+ functionality.</code>
 
 ---
 
