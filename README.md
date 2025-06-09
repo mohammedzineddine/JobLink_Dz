@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://img.icons8.com/external-tal-revivo-duo-tal-revivo/100/external-markdown-a-lightweight-markup-language-with-plain-text-formatting-syntax-logo-duo-tal-revivo.png" align="center" width="30%">
+   
 </p>
 <p align="center"><h1 align="center">JOBLINK_DZ</h1></p>
 <p align="center">
